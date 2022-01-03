@@ -3,20 +3,10 @@ const userModel = require("./model/userModel");
 const app = express();
 app.use(express.json());  // It used to parse json that is coming inside req.body
 
-const userRouter = express.Router();
+const userRouter = require("./Routers/userRouter")
 app.use("/user", userRouter);
 
-userRouter
-.route("/")
-.post(postSignUp)
-
-async function postSignUp(req, res){
-    let dataObj = req.body;
-    let user = await userModel.create(dataObj);
-    res.json({
-        msg:'user stored in db',
-        data: user
-    })
-}
+const authRouter = require("./Routers/authRouter");
+app.use("/auth", authRouter);
 
 app.listen(3000);

@@ -49,11 +49,11 @@ userSchema.pre("save", function(){
     this.confirmPassword = undefined;
 })
 
-userSchema.pre("save", async function(){
-    const salt = await bcrypt.genSalt();
-    const hashedString = await bcrypt.hash(this.password, salt);
-    this.password = hashedString;
-})
+// userSchema.pre("save", async function(){
+//     const salt = await bcrypt.genSalt();
+//     const hashedString = await bcrypt.hash(this.password, salt);
+//     this.password = hashedString;
+// })
 
 // Similarly we have post
 // userSchema.post("save", function(doc){  // document of the db
