@@ -1,7 +1,8 @@
 const express = require("express");
 const userModel = require("../model/userModel");
-
+const jwt = require("jsonwebtoken"); // {header: Algo, payload: unique id, signature: secret_key}
 const authRouter = express.Router();
+const JWT_KEY = require("../secret_key");
 
 authRouter
 .route("/signup")
@@ -29,6 +30,7 @@ async function postSignUp(req, res){
     })
 }
 
+// Login Functionality
 async function loginUser(req, res){
     try{
         let data = req.body;
@@ -37,6 +39,14 @@ async function loginUser(req, res){
             if(user){
                 // bcrypt --> compare
                 if(user.password === data.password){
+                    // Using Cookie
+                    // res.cookie("isLoggedIn", true, {httpOnly: true});
+                    
+                    // Using JWT
+                    // if you don't pass header by default it will take HS256 Algo
+                    let uid = user['_id']; 
+                    let token = jwt.sign({payload: uid}, JWT_KEY);  
+                    res.cookie('login', token, {httpOnly: true})
                     return res.json({
                         message: "User is logged in",
                         userDetails: data
