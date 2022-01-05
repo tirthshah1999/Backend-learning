@@ -1,21 +1,26 @@
 const express = require("express");
-const app = express();
 const protectedRoute = require("./authHelper");
-const {getUsers, postUser, updateUser, deleteUser} = require("../controller/userController");
+const {getUser, getAllUsers, updateUser, deleteUser} = require("../controller/userController");
 
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
-
-app.use(express.json());
 const userRouter = express.Router();
-app.use("/user", userRouter);
-
-
+// user options
 userRouter
-.route("/")
-.get(protectedRoute, getUsers)      // if user is loggedIn then only show all users
-.post(postUser)
+.route("/:id")
 .patch(updateUser)
 .delete(deleteUser)
+
+// profile page
+app.use(protectedRoute);
+
+userRouter
+.route("/userProfile")
+.get(getUser)
+
+// admin specific func
+app.use(isAuthorized(['admin']));
+
+userRouter
+.route("")
+.get(getAllUsers)
 
 module.exports = userRouter;

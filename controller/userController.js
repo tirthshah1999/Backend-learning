@@ -2,39 +2,75 @@
 
 const userModel = require("../model/userModel");
 
-module.exports.getUsers = async function getUsers(req, res){
-    let users = await userModel.find();
-    if(users){
-        return res.json(users);
+module.exports.getUser = async function getUser(req, res){
+    let id = req.params.id;
+    let user = await userModel.findById(id);
+    if(user){
+        return res.json(user);
     }else{
         return res.json({
-            message: "users not found"
+            message: "user not found"
         })
     }
 }
 
-module.exports.postUser = function postUser(req, res){
-    user = req.body;
-    res.json({
-        msg: "data recieved successfully",
-        user: req.body
-    })
-}
-
-module.exports.updateUser = function updateUser(req, res){
-    let dataToBeUpdated = req.body;
-    for(let key in dataToBeUpdated){
-        user[key] = dataToBeUpdated[key];
+module.exports.updateUser = async function updateUser(req, res){
+    try{
+        let id = req.params.id;
+        let user = await userModel.findById(id);
+        let dataToBeUpdated = req.body;
+        if(user){
+            // user can update multiple things at a time so arr
+            const keys = [];
+            for(let key in dataToBeUpdated){
+                keys.push(key);
+            }
+            for(let i = 0; i < keys.length; i++){
+                user[keys[i]] = dataToBeUpdated[keys[i]];
+            }
+    
+            const updatedData = await user.save();
+            res.json({
+                msg: "data updated successfully",
+                data: user
+            })
+        }else{
+            res.json({
+                msg: "user not found"
+            })
+        }    
+    }catch(e){
+        res.json({
+            msg: err.message
+        })
     }
-
-    res.json({
-        msg: "data updated successfully"
-    })
 }
 
-module.exports.deleteUser = function deleteUser(req, res){
-    user = {};
-    res.json({
-        msg: "data deleted successfully"
-    })
+module.exports.deleteUser = async function deleteUser(req, res){
+    let id = req.params.id;
+    let user = await userModel.findByIdAndDelete(id);
+    if(user){
+        res.json({
+            msg: "user deleted successfully",
+            data: user
+        })
+    }else{
+        res.json({
+            msg: "user not found"
+        })
+    }
+}
+
+module.exports.getAllUsers = async function getAllUsers(req, res){
+    let users = await userModel.find();
+    if(users){
+        res.json({
+            msg: "user get successfully",
+            data: users
+        })
+    }else{
+        res.json({
+            msg: "users not found"
+        })
+    }
 }
