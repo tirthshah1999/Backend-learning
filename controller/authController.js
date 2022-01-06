@@ -1,0 +1,109 @@
+const userModel = require("../model/userModel");
+const jwt = require("jsonwebtoken");
+const JWT_KEY = require("../secret_key");
+
+// SignUp 
+module.exports.signup = async function signup(req, res){
+    try{
+        let dataObj = req.body;
+        let user = await userModel.create(dataObj);
+        if(user){
+            res.json({
+                msg:'user signed up',
+                data: user
+            })
+        }else{
+            res.json({
+                msg: 'error while signing up'
+            })
+        }
+    }catch(err){
+        res.json({
+            msg: err.message
+        })
+    }
+}
+
+// Login
+module.exports.login = async function login(req, res) {
+    try {
+      let data = req.body;
+      if (data.email) {
+        let user = await userModel.findOne({ email: data.email });
+        if (user) {
+          //bcrypt -> compare
+          if (user.password == data.password) {
+            let uid = user["_id"]; //uid
+            let token = jwt.sign({ payload: uid }, JWT_KEY);
+            res.cookie("login", token, { httpOnly: true });
+            // res.cookie('isLoggedIn',true);
+            return res.json({
+              msg: "User has logged in",
+              data: user
+            });
+          } else {
+            return res.json({
+              msg: "wrong credentials"
+            });
+          }
+        } else {
+          return res.json({
+            msg: "Please login",
+          });
+        }
+      } else {
+        return res.json({
+          msg: "Empty field found",
+        });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        msg: err.message,
+      });
+    }
+  };
+
+// isAuthorized -> to check users role [admin, user]
+module.exports.isAuthorized = function isAuthorized(roles){
+    return function(req, res, next){
+        if(roles.includes(req.role)){
+            next();
+        }else{
+            res.status(401).json({
+              message: "operation not allowed",
+            });
+        }
+    }
+}
+
+// protected route
+module.exports.protectedRoute = async function protectedRoute(req, res, next){
+    try{
+        let token;
+        if(req.cookies.login){
+          token = req.cookies.login;
+          let payload = jwt.verify(token, JWT_KEY);
+          if(payload){
+            console.log(payload);
+            const user = await userModel.findById(payload.payload);
+            req.role = user.role;
+            req.id = user.id;
+            console.log(req.role);
+            console.log(req.id);
+            next();
+          }else{
+            res.json({
+              message: "jwt token not verfied, please login again"
+            })    
+          }
+        }else{
+          res.json({
+            message: "please login"
+          })
+        }
+      }catch(err){
+        return res.json({
+            msg: err.message
+        })
+    }
+}

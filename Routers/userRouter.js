@@ -1,6 +1,6 @@
 const express = require("express");
-const protectedRoute = require("./authHelper");
 const {getUser, getAllUsers, updateUser, deleteUser} = require("../controller/userController");
+const {signup, login, isAuthorized, protectedRoute} = require("../controller/authController");
 
 const userRouter = express.Router();
 // user options
@@ -9,15 +9,23 @@ userRouter
 .patch(updateUser)
 .delete(deleteUser)
 
+userRouter
+.route("/signup")
+.post(signup)
+
+userRouter
+.route("/login")
+.post(login)
+
 // profile page
-app.use(protectedRoute);
+userRouter.use(protectedRoute);
 
 userRouter
 .route("/userProfile")
 .get(getUser)
 
 // admin specific func
-app.use(isAuthorized(['admin']));
+userRouter.use(isAuthorized(['admin']));
 
 userRouter
 .route("")

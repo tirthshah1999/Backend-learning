@@ -39,7 +39,16 @@ const userSchema = mongoose.Schema({
         validate: function(){
             return this.confirmPassword == this.password
         }
-    }
+    },
+    role:{
+        type: String,
+        enum: ['admin','user'],
+        default: 'user'
+      },
+      profileImage:{
+        type: String,
+        default: '../Images/UserIcon.png'
+      },
 })
 
 /* mongoose hooks --> Hooks are used if you want to do something before or after saving into db 

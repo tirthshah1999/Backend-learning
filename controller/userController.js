@@ -3,7 +3,7 @@
 const userModel = require("../model/userModel");
 
 module.exports.getUser = async function getUser(req, res){
-    let id = req.params.id;
+    let id = req.id;
     let user = await userModel.findById(id);
     if(user){
         return res.json(user);
@@ -28,18 +28,18 @@ module.exports.updateUser = async function updateUser(req, res){
             for(let i = 0; i < keys.length; i++){
                 user[keys[i]] = dataToBeUpdated[keys[i]];
             }
-    
+            user.confirmPassword = user.password;
             const updatedData = await user.save();
             res.json({
                 msg: "data updated successfully",
-                data: user
+                data: updatedData
             })
         }else{
             res.json({
                 msg: "user not found"
             })
         }    
-    }catch(e){
+    }catch(err){
         res.json({
             msg: err.message
         })
