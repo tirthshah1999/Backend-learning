@@ -44,11 +44,12 @@ const userSchema = mongoose.Schema({
         type: String,
         enum: ['admin','user'],
         default: 'user'
-      },
-      profileImage:{
+    },
+    profileImage:{
         type: String,
         default: '../Images/UserIcon.png'
-      },
+    },
+    resetToken: String
 })
 
 /* mongoose hooks --> Hooks are used if you want to do something before or after saving into db 
@@ -68,6 +69,20 @@ userSchema.pre("save", function(){
 // userSchema.post("save", function(doc){  // document of the db
 //     console.log("after saving into db this will run", doc);
 // })
+
+// Adding methods in userSchema
+userSchema.methods.createResetToken = function(){
+    // creating unique token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    this.resetToken = resetToken;
+    return resetToken;
+}
+
+userSchema.methods.resetPasswordHandler = function(password, confirmPassword){
+    this.password = password;
+    this.confirmPassword = confirmPassword;
+    this.resetToken = undefined;
+}
 
 // After creating schema, now create model
 const userModel = mongoose.model('userModel', userSchema);

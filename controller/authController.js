@@ -63,6 +63,52 @@ module.exports.login = async function login(req, res) {
     }
   };
 
+// Forget Password
+module.exports.forgetPassword = async function forgetPassword(req, res){
+  let {email} = req.body;
+  try{
+    const user = await userModel.findOne({email});
+    if(user){
+      // create new token
+      const resetToken = user.createResetToken();
+      let resetPasswordLink = `${req.protocol}://${req.get("host")}/resetpassword/${resetToken}`;
+    }else{
+      return res.json({
+        msg: "please sign up"
+      })
+    }
+  }catch(err){
+    res.status(500).json({
+      msg: err.message
+    })
+  }
+} 
+
+// Reset Password
+module.exports.resetPassword = async function resetPassword(req, res){
+  try{
+    const token = req.params.token;
+    let {password, confirmPassword} = req.body;
+    const user = await userModel.findOne({resetToken: token});
+    if(user){
+      //update user password in db
+      user.resetPasswordHandler(password, confirmPassword);
+      await user.save();
+      res.json({
+        msg: "password changed succesfully, please login again"
+      })
+    }else{
+      res.json({
+        message: "user not found",
+      });
+    }
+  }catch(err){
+    res.json({
+      message: err.message,
+    });
+  }
+}
+
 // isAuthorized -> to check users role [admin, user]
 module.exports.isAuthorized = function isAuthorized(roles){
     return function(req, res, next){
