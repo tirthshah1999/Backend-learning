@@ -9,5 +9,8 @@ app.use(express.json());  // It used to parse json that is coming inside req.bod
 const userRouter = require("./Routers/userRouter")
 app.use("/user", userRouter);
 
+const planRouter = require("./Routers/planRouter")
+app.use("/plans", planRouter);
+
 
 app.listen(3000);

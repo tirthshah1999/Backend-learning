@@ -1,7 +1,13 @@
 const express = require("express");
 const {protectedRoute, isAuthorized} = require("../controller/authController");
+const {getPlan, getAllPlans, createPlan, updatePlan, deletePlan, topPlans} = require('../controller/planController');
 
 const planRouter = express.Router();
+
+// Top Plans
+planRouter
+.route("/topPlans")
+.get(topPlans)
 
 // All Plans
 planRouter
@@ -14,10 +20,15 @@ planRouter
 .route("/plan/:id")
 .get(getPlan)
 
-planRouter.use(isAuthorized['admin', 'restaurantowner'])
+// Crud Plan --> Only admin and owner can do this operations
+planRouter.use(isAuthorized(['admin', 'restaurantowner']))
 planRouter
 .route("/crudPlan")
 .post(createPlan)
+
+planRouter.use(isAuthorized(['admin', 'restaurantowner']))
+planRouter
+.route("/crudPlan/:id")
 .patch(updatePlan)
 .delete(deletePlan)
 
