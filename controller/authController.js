@@ -61,7 +61,17 @@ module.exports.login = async function login(req, res) {
         msg: err.message,
       });
     }
-  };
+};
+
+// Logout
+module.exports.logout = function logout(req, res){
+  // destroy jwt token
+  // override login cookie to be empty and delete in 1ms.
+  res.cookie('login', '', {maxAge: 1});
+  res.json({
+      msg: "user logged out successfully"
+  })
+}
 
 // Forget Password
 module.exports.forgetPassword = async function forgetPassword(req, res){
@@ -143,6 +153,11 @@ module.exports.protectedRoute = async function protectedRoute(req, res, next){
             })    
           }
         }else{
+          // for browser
+          const client = req.get("User-Agent");
+          if(client.includes("Mozilla")){
+            return res.redirect("/login");
+          }
           res.json({
             message: "please login"
           })

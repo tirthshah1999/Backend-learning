@@ -1,6 +1,6 @@
 const express = require("express");
 const {getUser, getAllUsers, updateUser, deleteUser} = require("../controller/userController");
-const {signup, login, isAuthorized, protectedRoute} = require("../controller/authController");
+const {signup, login, logout, isAuthorized, protectedRoute, forgetPassword, resetPassword} = require("../controller/authController");
 
 const userRouter = express.Router();
 // user options
@@ -16,6 +16,10 @@ userRouter
 userRouter
 .route("/login")
 .post(login)
+
+userRouter
+.route("/logout")
+.get(logout)
 
 userRouter
 .route("/forgetpassword")
