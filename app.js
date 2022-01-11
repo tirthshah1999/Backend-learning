@@ -12,5 +12,7 @@ app.use("/user", userRouter);
 const planRouter = require("./Routers/planRouter")
 app.use("/plans", planRouter);
 
+const reviewRouter = require("./Routers/reviewRouter");
+app.use("/reviews", reviewRouter);
 
 app.listen(3000);
